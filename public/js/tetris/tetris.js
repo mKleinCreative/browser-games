@@ -4,7 +4,7 @@ var linecount = document.getElementById('lines');
 var clear = window.getComputedStyle(canvas).getPropertyValue('background-color');
 var width = 10;
 var height = 20;
-var tilesz = 24;
+var tilesz = 36;
 canvas.width = width * tilesz;
 canvas.height = height * tilesz;
 
@@ -16,17 +16,23 @@ for (var r = 0; r < height; r++) {
   }
 }
 
+function pieceStorage() {
+
+}
+
 function newPiece() {
   var p = pieces[parseInt(Math.random() * pieces.length, 10)];
   return new Piece(p[0], p[1]);
 }
 
+
+
 function drawSquare(x, y) {
   ctx.fillRect(x * tilesz, y * tilesz, tilesz, tilesz)
   var ss = ctx.strokeStyle
-  ctx.strokeStyle = "#555"
+  ctx.strokeStyle = "#fffffb"
   ctx.strokeRect(x * tilesz, y * tilesz, tilesz, tilesz)
-  ctx.strokeStyle = "#888"
+  ctx.strokeStyle = "#fffffb"
   ctx.strokeRect(x * tilesz + 3*tilesz/8, y * tilesz + 3*tilesz/8, tilesz/4, tilesz/4)
   ctx.strokeStyle = ss
 }
@@ -88,6 +94,7 @@ Piece.prototype._collides = function(dx, dy, pat) {
 };
 
 Piece.prototype.down = function() {
+  console.log( '<3333333 entered down <3333333', Date.now() )
   if (this._collides(0, 1, this.pattern)) {
     this.lock();
     piece = newPiece();
@@ -125,7 +132,7 @@ Piece.prototype.lock = function() {
 
       if (this.y + iy < 0) {
         // Game ends!
-        alert("You're done!");
+        //alert("You're done!");
         done = true;
         return;
       }
@@ -183,25 +190,29 @@ Piece.prototype.draw = function(ctx) {
 };
 
 var pieces = [
-  [I, "cyan"],
-  [J, "blue"],
-  [L, "orange"],
-  [O, "yellow"],
+  [I, "olive"],
+  [J, "darkcyan"],
+  [L, "orangered"],
+  [O, "mediumaquamarine"],
   [S, "green"],
-  [T, "purple"],
-  [Z, "red"]
+  [T, "rebeccapurple"],
+  [Z, "crimson"]
 ];
+
 var piece = null;
 
 var dropStart = Date.now();
+
 var downI = {};
+
 document.body.addEventListener("keydown", function (e) {
   if (downI[e.keyCode] !== null) {
     clearInterval(downI[e.keyCode]);
   }
   key(e.keyCode);
-  downI[e.keyCode] = setInterval(key.bind(this, e.keyCode), 200);
+  downI[e.keyCode] = setInterval(key.bind(this, e.keyCode), 10);
 }, false);
+
 document.body.addEventListener("keyup", function (e) {
   if (downI[e.keyCode] !== null) {
     clearInterval(downI[e.keyCode]);
@@ -244,11 +255,14 @@ function drawBoard() {
 function main() {
   var now = Date.now();
   var delta = now - dropStart;
+  console.log( '<3333333 entered main <3333333', now, dropStart, delta )
 
   if (delta > 1000) {
     piece.down();
     dropStart = now;
   }
+
+  //setInterval(() => piece.down(), 1000)
 
   if (!done) {
     requestAnimationFrame(main);
