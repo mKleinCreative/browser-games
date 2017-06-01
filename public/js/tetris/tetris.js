@@ -5,6 +5,26 @@ var clear = window.getComputedStyle(canvas).getPropertyValue('background-color')
 var width = 10;
 var height = 20;
 var tilesz = 36;
+var dropSpeed = 1000;
+
+var difficulty = {
+  current: 'beginner',
+  beginner: 1,
+  easy: 2,
+  medium: 3,
+  hard: 4,
+  IMPOSSIBLE: 5,
+  increaseDifficulty: () => {
+    this.current = {
+      beginner: 'easy',
+      easy: 'medium',
+      medium: 'hard',
+      hard: 'IMPOSSIBLE',
+      IMPOSSIBLE: 'IMPOSSIBLE',
+    }[this.current]
+  }
+};
+
 canvas.width = width * tilesz;
 canvas.height = height * tilesz;
 
@@ -94,7 +114,6 @@ Piece.prototype._collides = function(dx, dy, pat) {
 };
 
 Piece.prototype.down = function() {
-  console.log( '<3333333 entered down <3333333', Date.now() )
   if (this._collides(0, 1, this.pattern)) {
     this.lock();
     piece = newPiece();
@@ -163,7 +182,12 @@ Piece.prototype.lock = function() {
     lines += nlines;
     drawBoard();
     linecount.textContent = "Lines: " + lines;
+    if(nlines >= difficulty[difficulty.current]) {
+      difficulty.increaseDifficulty()
+      difficulty[difficulty.current] === "IMPOSSIBLE" ? dropSpeed === 150 : dropSpeed -= 170
+    }
   }
+
 };
 
 Piece.prototype._fill = function(color) {
@@ -210,7 +234,7 @@ document.body.addEventListener("keydown", function (e) {
     clearInterval(downI[e.keyCode]);
   }
   key(e.keyCode);
-  downI[e.keyCode] = setInterval(key.bind(this, e.keyCode), 10);
+  downI[e.keyCode] = setInterval(key.bind(this, e.keyCode), 300);
 }, false);
 
 document.body.addEventListener("keyup", function (e) {
@@ -226,18 +250,15 @@ function key(k) {
   }
   if (k == 38) { // Player pressed up
     piece.rotate();
-    dropStart = Date.now();
   }
   if (k == 40) { // Player holding down
     piece.down();
   }
   if (k == 37) { // Player holding left
     piece.moveLeft();
-    dropStart = Date.now();
   }
   if (k == 39) { // Player holding right
     piece.moveRight();
-    dropStart = Date.now();
   }
 }
 
@@ -255,11 +276,12 @@ function drawBoard() {
 function main() {
   var now = Date.now();
   var delta = now - dropStart;
-  console.log( '<3333333 entered main <3333333', now, dropStart, delta )
+  // console.log( '<3333333 entered main <3333333', now, dropStart, delta )
 
-  if (delta > 1000) {
+  if (delta > dropSpeed) {
     piece.down();
     dropStart = now;
+    console.log('DROP SPEED YO:', dropSpeed)
   }
 
   //setInterval(() => piece.down(), 1000)
