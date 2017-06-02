@@ -68,6 +68,25 @@ function Piece(patterns, color) {
   this.y = -2;
 }
 
+var pieces = [
+  [I, "olive"],
+  [J, "darkcyan"],
+  [L, "orangered"],
+  [O, "mediumaquamarine"],
+  [S, "green"],
+  [T, "rebeccapurple"],
+  [Z, "crimson"]
+];
+
+var piece = null;
+
+var dropStart = Date.now();
+
+var downI = {};
+
+var WALL = 1;
+var BLOCK = 2;
+
 Piece.prototype.rotate = function() {
   var nudge = 0;
   var nextpat = this.patterns[(this.patterni + 1) % this.patterns.length];
@@ -86,8 +105,6 @@ Piece.prototype.rotate = function() {
   }
 };
 
-var WALL = 1;
-var BLOCK = 2;
 Piece.prototype._collides = function(dx, dy, pat) {
   for (var ix = 0; ix < pat.length; ix++) {
     for (var iy = 0; iy < pat.length; iy++) {
@@ -140,7 +157,7 @@ Piece.prototype.moveLeft = function() {
   }
 };
 
-var lines = 0;
+var lines = 4;
 var done = false;
 Piece.prototype.lock = function() {
   for (var ix = 0; ix < this.pattern.length; ix++) {
@@ -182,11 +199,13 @@ Piece.prototype.lock = function() {
     lines += nlines;
     drawBoard();
     linecount.textContent = "Lines: " + lines;
-    if(nlines >= difficulty[difficulty.current]) {
-      difficulty.increaseDifficulty()
-      difficulty[difficulty.current] === "IMPOSSIBLE" ? dropSpeed === 150 : dropSpeed -= 170
-    }
+    if(difficulty[difficulty.current] === "IMPOSSIBLE") {
+       dropSpeed = 150
+    } else if ( nlines >= difficulty[difficulty.current] ) {
+    difficulty.increaseDifficulty()
+    dropSpeed -= 170
   }
+}
 
 };
 
@@ -213,21 +232,6 @@ Piece.prototype.draw = function(ctx) {
   this._fill(this.color);
 };
 
-var pieces = [
-  [I, "olive"],
-  [J, "darkcyan"],
-  [L, "orangered"],
-  [O, "mediumaquamarine"],
-  [S, "green"],
-  [T, "rebeccapurple"],
-  [Z, "crimson"]
-];
-
-var piece = null;
-
-var dropStart = Date.now();
-
-var downI = {};
 
 document.body.addEventListener("keydown", function (e) {
   if (downI[e.keyCode] !== null) {
